@@ -141,7 +141,8 @@ namespace MinesweeperApp
                 if ((bool)button.Tag && button.Text == "")
                 {
                     button.BackColor = Color.Red;
-                    button.Text = "*";
+                    button.Font = new Font("Wingdings", 10);
+                    button.Text = "M";
                 }
             }
         }
@@ -168,16 +169,17 @@ namespace MinesweeperApp
 
             if (e.Button == MouseButtons.Right)
             {
-                if (string.IsNullOrEmpty(clickedButton.Text))
+                if (clickedButton.BackColor == SystemColors.Control)
                 {
-                    if (clickedButton.BackColor == Color.Blue)
-                    {
-                        clickedButton.BackColor = SystemColors.Control;
-                    }
-                    else
-                    {
-                        clickedButton.BackColor = Color.Blue;
-                    }
+                    clickedButton.BackColor = Color.Blue;
+                    clickedButton.Font = new Font("Wingdings", 10);
+                    clickedButton.Text = "O";
+                }
+                else
+                {
+                    clickedButton.BackColor = SystemColors.Control;
+                    clickedButton.Font = null;
+                    clickedButton.Text = "";
                 }
             }
             else if (e.Button == MouseButtons.Left)
@@ -195,7 +197,6 @@ namespace MinesweeperApp
                 }
             }
         }
-
 
 
         private void PlaceBombsRandomly()
@@ -224,7 +225,7 @@ namespace MinesweeperApp
 
         private void ClickCount(Button clickedButton)
         {
-            if (!clickedButtons.Contains(clickedButton))
+            if (clickedButton.Text != "0" && !clickedButtons.Contains(clickedButton))
             {
                 int count = int.Parse(lblclickcount.Text);
                 count++;
@@ -234,14 +235,33 @@ namespace MinesweeperApp
             }
         }
 
+
+        private void ResetButtons()
+        {
+            foreach (Button button in lstallbuttons)
+            {
+                button.BackColor = SystemColors.Control;
+                button.Font = null;
+                button.Text = "";
+            }
+        }
+
         private void StartGame()
         {
+            clickedButtons.Clear();
+            bombButtons.Clear();
+            gamestatus = GameStatusEnum.NotStarted;
+
+            ResetButtons();
+
             PlaceBombsRandomly();
             lblclickcount.Text = "0";
             gamestatus = GameStatusEnum.Playing;
             DisplayGameStatus();
             btnstart.Text = "Restart";
         }
+
+
         private void DisplayGameStatus()
         {
             string msg = "Click Start to begin Game";
