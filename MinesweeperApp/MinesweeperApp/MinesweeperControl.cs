@@ -47,58 +47,20 @@ namespace MinesweeperApp
 
 
         }
+
         private void NumberofBombsAround(Button clickedButton)
         {
             int index = lstallbuttons.IndexOf(clickedButton);
             int row = index / 10;
             int col = index % 10;
 
-            if (clickedButton.Text == "0")
+            int count = CountAdjacentBombs(row, col);
+
+            clickedButton.Text = count.ToString();
+
+            if (count == 0)
             {
-                int[] dx = { -1, -1, -1, 0, 0, 1, 1, 1 };
-                int[] dy = { -1, 0, 1, -1, 1, -1, 0, 1 };
-
-                for (int i = 0; i < 8; i++)
-                {
-                    int newRow = row + dx[i];
-                    int newCol = col + dy[i];
-
-                    if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10)
-                    {
-                        int newIndex = newRow * 10 + newCol;
-                        Button neighborButton = lstallbuttons[newIndex];
-
-                        if (!clickedButtons.Contains(neighborButton) && neighborButton.Text == "")
-                        {
-                            NumberofBombsAround(neighborButton);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                int count = 0;
-                int[] dx = { -1, -1, -1, 0, 0, 1, 1, 1 };
-                int[] dy = { -1, 0, 1, -1, 1, -1, 0, 1 };
-
-                for (int i = 0; i < 8; i++)
-                {
-                    int newRow = row + dx[i];
-                    int newCol = col + dy[i];
-
-                    if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10)
-                    {
-                        int newIndex = newRow * 10 + newCol;
-                        Button neighborButton = lstallbuttons[newIndex];
-
-                        if ((bool)neighborButton.Tag)
-                        {
-                            count++;
-                        }
-                    }
-                }
-
-                clickedButton.Text = count.ToString();
+                AutoRevealAdjacentNumbers(clickedButton);
             }
 
             if (CheckWinCondition())
@@ -107,6 +69,68 @@ namespace MinesweeperApp
                 DisplayGameStatus();
             }
         }
+
+
+
+        private int CountAdjacentBombs(int row, int col)
+        {
+            int count = 0;
+            int[] dx = { -1, -1, -1, 0, 0, 1, 1, 1 };
+            int[] dy = { -1, 0, 1, -1, 1, -1, 0, 1 };
+
+            for (int i = 0; i < 8; i++)
+            {
+                int newRow = row + dx[i];
+                int newCol = col + dy[i];
+
+                if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10)
+                {
+                    int newIndex = newRow * 10 + newCol;
+                    Button neighborButton = lstallbuttons[newIndex];
+
+                    if ((bool)neighborButton.Tag)
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        private void AutoRevealAdjacentNumbers(Button clickedButton)
+        {
+            int index = lstallbuttons.IndexOf(clickedButton);
+            int row = index / 10;
+            int col = index % 10;
+
+            int[] dx = { -1, -1, -1, 0, 0, 1, 1, 1 };
+            int[] dy = { -1, 0, 1, -1, 1, -1, 0, 1 };
+
+            for (int i = 0; i < 8; i++)
+            {
+                int newRow = row + dx[i];
+                int newCol = col + dy[i];
+
+                if (newRow >= 0 && newRow < 10 && newCol >= 0 && newCol < 10)
+                {
+                    int newIndex = newRow * 10 + newCol;
+                    Button neighborButton = lstallbuttons[newIndex];
+
+                    if (neighborButton.Text == "")
+                    {
+                        int neighborCount = CountAdjacentBombs(newRow, newCol);
+                        neighborButton.Text = neighborCount.ToString();
+
+                        if (neighborCount == 0)
+                        {
+                            AutoRevealAdjacentNumbers(neighborButton);
+                        }
+                    }
+                }
+            }
+        }
+
         private void Button_Click(object sender, EventArgs e)
         {
             Button clickedButton = (Button)sender;
@@ -124,6 +148,7 @@ namespace MinesweeperApp
             }
             else
             {
+                AutoRevealAdjacentNumbers(clickedButton); 
                 ClickCount(clickedButton);
 
                 if (CheckWinCondition())
@@ -133,6 +158,7 @@ namespace MinesweeperApp
                 }
             }
         }
+
 
         private void LoserReveal()
         {
@@ -169,6 +195,11 @@ namespace MinesweeperApp
 
             if (e.Button == MouseButtons.Right)
             {
+                if (clickedButton.Text != "" && char.IsDigit(clickedButton.Text[0]))
+                {
+                    return;
+                }
+
                 if (clickedButton.BackColor == SystemColors.Control)
                 {
                     clickedButton.BackColor = Color.Blue;
@@ -184,6 +215,11 @@ namespace MinesweeperApp
             }
             else if (e.Button == MouseButtons.Left)
             {
+                if (clickedButton.Text == "O") 
+                {
+                    return; 
+                }
+
                 if (bombButtons.Contains(clickedButton))
                 {
                     LoserReveal();
@@ -197,7 +233,6 @@ namespace MinesweeperApp
                 }
             }
         }
-
 
         private void PlaceBombsRandomly()
         {
@@ -225,7 +260,7 @@ namespace MinesweeperApp
 
         private void ClickCount(Button clickedButton)
         {
-            if (clickedButton.Text != "0" && !clickedButtons.Contains(clickedButton))
+            if (!clickedButtons.Contains(clickedButton))
             {
                 int count = int.Parse(lblclickcount.Text);
                 count++;
