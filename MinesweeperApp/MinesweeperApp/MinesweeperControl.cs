@@ -245,7 +245,7 @@ namespace MinesweeperApp
                 button.Text = "";
             }
             int bombCount = 0;
-            while (bombCount < 10)
+            while (bombCount < 13)
             {
                 int index = random.Next(lstallbuttons.Count);
                 Button button = lstallbuttons[index];
