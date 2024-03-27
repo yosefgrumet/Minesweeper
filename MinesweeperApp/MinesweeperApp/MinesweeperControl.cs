@@ -159,7 +159,6 @@ namespace MinesweeperApp
             }
         }
 
-
         private void LoserReveal()
         {
             foreach (Button button in lstallbuttons)
@@ -167,11 +166,23 @@ namespace MinesweeperApp
                 if ((bool)button.Tag && button.Text == "")
                 {
                     button.BackColor = Color.Red;
-                    button.Font = new Font("Wingdings", 10);
+                    button.Font = new Font("Wingdings", 10, FontStyle.Bold);
                     button.Text = "M";
+                }
+                else if (!(bool)button.Tag && button.BackColor == Color.Blue)
+                {
+                    button.BackColor = Color.Black;
+                    button.ForeColor = Color.White;
+                    button.Font = new Font("Cooper", 10, FontStyle.Bold);
+                    button.Text = "X";
+                }
+                else if ((bool)button.Tag && bombButtons.Contains(button))
+                {
+                    button.BackColor = Color.Green;
                 }
             }
         }
+
         private bool CheckWinCondition()
         {
             foreach (Button button in lstallbuttons)
@@ -203,7 +214,7 @@ namespace MinesweeperApp
                 if (clickedButton.BackColor == SystemColors.Control)
                 {
                     clickedButton.BackColor = Color.Blue;
-                    clickedButton.Font = new Font("Wingdings", 10);
+                    clickedButton.Font = new Font("Wingdings", 10, FontStyle.Bold);
                     clickedButton.Text = "O";
                 }
                 else
